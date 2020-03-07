@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=\, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        .wrapper {
+            background-color: #e2f3f5;
+            background-attachment: fixed;
+            display: grid;
+            padding: 0 3em;
+            grid-gap: 2em;
+            grid-template-columns: repeat(auto-fit, minmax(178px, 1fr+1));
+            font-family: fantasy;
+            height: 97vh;
+        }
+
+        .container {
+            --main-box-color: black;
+
+            padding: 4em;
+            margin: auto;
+            /* margin: 10px; */
+            border: solid 20px transparent;
+            border-radius: 20%;
+            background-color: var(--main-box-color);
+
+            box-shadow: 10px 10px 30px var(--main-box-color);
+
+        }
+
+        .output-box {
+            margin: auto;
+
+            padding: 10px 50px;
+            border: solid 5px transparent;
+            border-radius: 20%;
+            background-color: white;
+            box-shadow: 10px 10px 30px black;
+        }
+
+        .output-box h1 {
+            text-align: center;
+
+
+        }
+
+        #level {
+            font-size: 3em;
+        }
+
+        #box-5 {
+            grid-column: span 2;
+
+        }
+
+        .label {
+            text-align: center;
+            grid-column: span 4;
+            margin-bottom: -150px;
+        }
+
+        #message {
+            text-align: center;
+            grid-column: span 4;
+        }
+
+
+        .options {
+            display: grid;
+            text-align: center;
+            background: #22d1ee;
+            border-radius: 20%;
+            grid-gap: 1em;
+            grid-template-rows: repeat(1);
+            padding: 20px 0;
+        }
+
+
+        .mode-btn {
+            background-color: #3d5af1;
+            color: #0e153a;
+            padding: 1em;
+            margin: auto 30px;
+            border-radius: 20%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div id="box-1" class="container input-box"></div>
+        <div id="box-2" class="container input-box"></div>
+        <div id="box-3" class="container input-box"></div>
+        <div id="box-4" class="container input-box"></div>
+        <div class="label">
+            <h1>Level</h1>
+        </div>
+        <div class="modes options">
+            <h1>Modes</h1>
+
+            <button id="simon-says" class="mode-btn">Simon Says</button>
+            <button id="random" class="mode-btn">Random</button>
+            <button id="checkpoint" class="mode-btn">Checkpoint</button>
+        </div>
+        <div id="box-5" class="output-box">
+            <h1 id="level">START</h1>
+        </div>
+        <div class="modes options ">
+            <h1>Difficulty</h1>
+
+            <button id="easy" class="mode-btn">Easy</button>
+            <button id="medium" class="mode-btn">Medium</button>
+            <button id="hard" class="mode-btn">Hard</button>
+        </div>
+        <h1 id="message">Choose the Correct Combination</h1>
+    </div>
+
+</body>
+
+<script type="text/javascript">
+    let box1 = document.getElementById("box-1");
+    let box2 = document.getElementById("box-2");
+    let box3 = document.getElementById("box-3");
+    let box4 = document.getElementById("box-4");
+    let box5 = document.getElementById("box-5");
+
+    let simonBtn = document.getElementById("simon-says");
+    let randomBtn = document.getElementById("random");
+    let checkpointBtn = document.getElementById("checkpoint");
+    let easyBtn = document.getElementById("easy");
+    let mediumBtn = document.getElementById("medium");
+    let hardBtn = document.getElementById("hard");
+
+    box1.style.backgroundColor = 'red';
+    box2.style.backgroundColor = 'blue';
+    box3.style.backgroundColor = 'yellow';
+    box4.style.backgroundColor = 'green';
+    box5.style.backgroundColor = 'white';
+
+    let inputBoxs = document.querySelectorAll('.input-box');
+
+
+
+    let colors = [
+
+        { id: 0, color: 'red' },
+
+        { id: 1, color: 'blue' },
+
+        { id: 2, color: 'yellow' },
+
+        { id: 3, color: 'green' },
+    ];
+
+    let speeds = {
+        'easy': 750,
+        'medium': 500,
+        'hard': 200
+    }
+
+    let blinkRates = {
+        'easy': 400,
+        'medium': 300,
+        'hard': 200
+    }
+
+    let level = 1;
+    let speed = speeds.easy;
+    let blinkRate = blinkRates.easy ;
+
+    let combination = [];
+    let mode = [{ type: 0, name: "Simon Says", func: getSequenceForLvlForSimonSays }, { type: 1, name: "Random", func: getSequenceForLvlForRandom }, { type: 2, name: "CheckPoint", func: getSequenceForLvlForSimonSays }]
+
+    let modeEnabled = mode[0]
+
+    let showingCombination = false;
+
+    let started = false;
+
+
+    //Difficulty Button changes speed
+
+    easyBtn.addEventListener('click', () => {
+        speed = speeds.easy;
+        blinkRate = blinkRates.easy;
+        document.querySelector('#level').innerHTML = "START";
+        started = false;
+
+        document.querySelector("#message").innerHTML = "Choose the Correct Combination";
+    })
+    mediumBtn.addEventListener('click', () => {
+        speed = speeds.medium;
+        blinkRate = blinkRates.medium;
+        document.querySelector('#level').innerHTML = "START";
+        started = false;
+
+        document.querySelector("#message").innerHTML = "Choose the Correct Combination";
+    })
+    hardBtn.addEventListener('click', () => {
+        speed = speeds.hard;
+        blinkRate = blinkRates.hard;
+        document.querySelector('#level').innerHTML = "START";
+        started = false;
+
+        document.querySelector("#message").innerHTML = "Choose the Correct Combination";
+    })
+
+    simonBtn.addEventListener('click', () => {
+        
+        modeEnabled = mode[0];
+        document.querySelector('#level').innerHTML = "START";
+        started = false;
+
+        document.querySelector("#message").innerHTML = "Choose the Correct Combination";
+
+
+    });
+
+    randomBtn.addEventListener('click', () => {
+
+        modeEnabled = mode[1];
+        document.querySelector('#level').innerHTML = "START";
+        started = false;
+
+        document.querySelector("#message").innerHTML = "Choose the Correct Combination";
+    });
+
+    checkpointBtn.addEventListener('click', () => {
+
+        
+        modeEnabled = mode[2];
+        document.querySelector('#level').innerHTML = "START";
+        started = false;
+
+        document.querySelector("#message").innerHTML = "Choose the Correct Combination";
+    });
+
+
+
+
+
+    var retry = () => {
+
+        document.querySelector('#level').innerHTML = "START";
+        started = false;
+
+    }
+    // box1.addEventListener('click',()=>{
+
+    //     count++;
+    //     let element = document.getElementsByTagName("h1")[0];
+    //     let node = document.createTextNode(`Counter: ${count}`);
+    //     let newElement = document.createElement("h1");
+    //     newElement.appendChild(node);
+    //     element.replaceWith(newElement);
+    //     console.log(element.childNodes);
+    // } );
+
+    //Green on clicking 1-4
+    //   let boxOnePromise = new Promise((resolve, reject) => {
+    //       box1.addEventListener('click',()=>{
+
+    //           box2.addEventListener('click',()=>{
+    //             box3.addEventListener('click',()=>{
+    //                 box4.addEventListener('click',()=>{
+    //                     resolve("Sequence Complete!");
+
+    //                 });
+    //             });
+    //         });
+    //       });
+    //   });
+
+    //   boxOnePromise.then((successMessage) => {
+    //       console.log(successMessage);
+    //       box5.style.backgroundColor = 'green';
+    //   })
+
+    //Green on Clicking any 1-4
+
+
+    let boxOnePromise = () => {
+        return new Promise((resolve, reject) => {
+            box1.addEventListener('click', () => {
+                resolve("Box 1  RED clicked");
+            });
+
+        });
+    }
+    let boxTwoPromise = () => {
+        return new Promise((resolve, reject) => {
+            box2.addEventListener('click', () => {
+                resolve("Box 2  BLUE clicked");
+            });
+        });
+    }
+    let boxThreePromise = () => {
+        return new Promise((resolve, reject) => {
+            box3.addEventListener('click', () => {
+                resolve("Box 3  YELLOW clicked");
+            });
+        });
+    }
+    let boxFourPromise = () => {
+        return new Promise((resolve, reject) => {
+            box4.addEventListener('click', () => {
+                resolve("Box 4 BLACK clicked");
+            });
+        });
+    }
+
+    let sequence = (array, position) => {
+        if (array[position - 1] === box1.style.backgroundColor)
+            return boxOnePromise();
+        else if (array[position - 1] === box2.style.backgroundColor)
+            return boxTwoPromise();
+        else if (array[position - 1] === box3.style.backgroundColor)
+            return boxThreePromise();
+        else if (array[position - 1] === box4.style.backgroundColor)
+            return boxFourPromise();
+        else
+            console.log("color did not match");
+    }
+    // sequence(combination, 1)
+    //     .then((message) => {
+    //         console.log(message);
+    //         return sequence(combination, 2);
+    //     }).then((message) => {
+    //         console.log(message);
+    //         return sequence(combination, 3);
+    //     }).then((message) => {
+    //         console.log(message);
+    //         return sequence(combination, 4);
+    //     }).then((message) => {
+    //         console.log(message);
+    //         box5.style.backgroundColor = 'darkgreen';
+
+    //         document.querySelector("#message").innerHTML = "Well Done!";
+    //     });
+
+    // count = 0;
+    // let list = [];
+    // combination.forEach(element => {
+    //     let task = sequence(combination, ++count)
+    //     list.push(task);
+    // });
+    // Promise.all(list)
+    //     .then((results) => {
+    //         console.log(results);
+    //     })
+
+
+    const debounce = (func, delay) => {
+        let timeoutID;
+        return function (...args) {
+
+            if (timeoutID) {
+                clearTimeout(timeoutID);
+            }
+            timeoutID = setTimeout(() => {
+                func(...args)
+
+            }, delay);
+        };
+    };
+
+
+
+    let userSequence = [];
+
+
+
+    box1.addEventListener('click', () => {
+        if (!showingCombination && started) {
+            userSequence.push(box1.style.backgroundColor);
+            console.log(userSequence);
+
+            promise();
+        }
+    });
+    box2.addEventListener('click', () => {
+        if (!showingCombination && started) {
+            userSequence.push(box2.style.backgroundColor);
+            console.log(userSequence);
+            promise();
+        }
+    });
+    box3.addEventListener('click', () => {
+        if (!showingCombination && started) {
+
+            userSequence.push(box3.style.backgroundColor);
+            console.log(userSequence);
+            promise();
+        }
+
+    });
+    box4.addEventListener('click', () => {
+        if (!showingCombination && started) {
+            userSequence.push(box4.style.backgroundColor);
+            console.log(userSequence);
+            promise();
+        }
+
+    });
+
+
+
+    inputBoxs.forEach(inputBox => {
+        inputBox.addEventListener('mousedown', () => {
+            if (!showingCombination && started) {
+                inputBox.style.border = "solid 20px black";
+                inputBox.style.borderRadius = "20%";
+            }
+        });
+
+        inputBox.addEventListener('mouseup', () => {
+            if (!showingCombination && started)
+                inputBox.style.border = "solid 20px transparent";
+        });
+        inputBox.addEventListener('click', debounce(e => {
+            // if (!showingCombination && started)
+            if(!modeEnabled.type === 2)
+            document.querySelector("#message").innerHTML = "Choose the Correct Combination";
+        }, 1000));
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function getSequenceForLvlForRandom(level) {
+        combination = [];
+        for (let i = 1; i <= level; i++) {
+            let colorID = Math.floor(Math.random() * Math.floor(4));
+            let color = colors.find((color) => {
+
+                return color.id === colorID;
+
+            });
+            combination.push(color.color);
+        }
+        console.log(combination);
+
+    };
+
+    function getSequenceForLvlForSimonSays(level) {
+        if (level === 1)
+            combination = [];
+        let colorID = Math.floor(Math.random() * Math.floor(4));
+        let color = colors.find((color) => {
+            return color.id === colorID;
+        });
+        combination.push(color.color);
+    }
+
+
+
+
+
+
+
+
+
+
+
+    console.log(combination.map((color) => {
+        return colors.find((c) => {
+            return c.color === color;
+        })
+    }));
+
+
+
+    let getBoxDocument = (id) => {
+
+        return document.querySelector(`#box-${id}`);
+    }
+
+    let blink = (id, blinkRate) => {
+
+
+        let box = getBoxDocument(id);
+        box.style.border = "solid 20px black";
+        box.style.borderRadius = "20%";
+
+        setTimeout(() => {
+            box.style.border = "solid 20px transparent";
+        }, blinkRate);
+    }
+
+
+
+    let showSequence = (combination) => {
+        showingCombination = true;
+        console.log(showingCombination);
+        let colorObj = combination.map((color) => {
+            return colors.find((c) => {
+                return c.color === color;
+            });
+        });
+        delay = speed;
+        let count = 0;
+        colorObj.forEach(element => {
+            setTimeout(() => {
+                blink(element.id + 1, blinkRate);
+                count++;
+                if (colorObj.length === count) {
+                    showingCombination = false;
+                    console.log(showingCombination);
+                }
+
+            }, delay += speed);
+        });
+
+
+    }
+
+    // blink(1).then((message) => {
+    //     console.log(message);
+    //     return blink(2);
+    // })
+
+    let checkMatch = () => {
+        return new Promise((resolve, reject) => {
+            if (userSequence[userSequence.length - 1] === combination[userSequence.length - 1]) {
+                if(modeEnabled.type === 2)
+                    document.querySelector("#message").innerHTML = "...";
+                if (userSequence.toString() === combination.toString()) {
+                    resolve("Well Done!");
+                }
+            } else
+                reject("Try Again!!!");
+        });
+    }
+
+    let promise = () => {
+        checkMatch().then((message) => {
+            document.querySelector("#message").innerHTML = message;
+            // box5.style.backgroundColor = 'green';
+            userSequence = [];
+            level++;
+            document.querySelector('#level').innerHTML = level;
+            modeEnabled.func(level);
+            showSequence(combination);
+        }).catch((message) => {
+            console.log(message);
+            document.querySelector("#message").innerHTML = message;
+            userSequence = [];
+            if (modeEnabled.type === 0 || modeEnabled.type === 1) {
+                level = 1;
+                document.querySelector('#level').innerHTML = level;
+                combination = [];
+                retry();
+                modeEnabled.func(level);
+            }
+        });
+    }
+
+
+
+
+
+    box5.addEventListener('mousedown', () => {
+        if (!started) {
+            box5.style.border = "solid 20px black";
+            box5.style.borderRadius = "20%";
+        }
+
+
+    });
+
+    box5.addEventListener('mouseup', () => {
+        if (!started) {
+
+            box5.style.border = "solid 20px transparent";
+
+            start();
+
+
+        }
+
+    });
+
+    var start = () => {
+
+        started = true;
+        level = 1;
+
+        modeEnabled.func(level);
+        showSequence(combination);
+
+        document.querySelector('#level').innerHTML = level;
+    }
+
+
+
+
+
+
+
+
+</script>
+
+</html>
